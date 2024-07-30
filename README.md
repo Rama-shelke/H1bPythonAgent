@@ -14,10 +14,33 @@ Natural Language Querying: Enter natural language queries about the ingested dat
 Query Conversion: Convert natural language queries into Pandas queries.
 Context-Augmented Responses: Use GPT-3.5-turbo to generate natural language responses based on query results
 
-# Setup
+## Setup
 Add Credits to Your OpenAI Account:
 Ensure you have sufficient credits in your OpenAI account. You can add credits by visiting the OpenAI billing page.
 
 Generate an API Key and  Configure the .env File:
 Create a .env file in the project root directory and add your OpenAI API key:
 OPENAI_API_KEY=your-api-key
+
+# Example Queries and Results
+
+User Input:  what are the top 5 companies with the largest h1b filings
+Pandas Query by Llama Index: df['EMPLOYER_NAME'].value_counts().head()
+Output: 
+The top 5 companies with the largest H1B filings are:
+1. Ernst & Young U.S. LLP - 7262 filings
+2. Amazon.com Services LLC - 6090 filings
+3. Google LLC - 6067 filings
+4. Microsoft Corporation - 3441 filings
+5. COGNIZANT TECHNOLOGY SOLUTIONS US CORP - 3418 filings
+-------------
+User Input: what is the average prevailing wage of new york city employees in the h1b filing data?
+Pandas Query by Llama Index: df[df['EMPLOYER_CITY'] == 'NEW YORK CITY']['PREVAILING_WAGE'].mean()
+Output: The average prevailing wage of New York City employees in the H1B filing data is $143,998.
+
+-------------
+User Input:  what are all the different countries that the employers belong to?
+Pandas Query by Llama Index: df['EMPLOYER_COUNTRY'].unique()
+Output: The employers in the H1b filings belong to countries such as the United States of America, India, Georgia, Mexico, Angola, Afghanistan, Chile, Barbados, and Belgium.
+
+-------------
