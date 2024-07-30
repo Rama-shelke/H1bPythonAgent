@@ -1,43 +1,44 @@
 from dotenv import load_dotenv
+load_dotenv()
 import os
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 import pandas as pd
-from llama_index.query_engine import PandasQueryEngine
+from llama_index.experimental.query_engine import PandasQueryEngine
 from prompts import new_prompt, instruction_str, context
 from note_engine import note_engine
-from llama_index.tools import QueryEngineTool, ToolMetadata
-from llama_index.agent import ReActAgent
-from llama_index.llms import OpenAI
-from pdf import canada_engine
+from llama_index.core.tools import QueryEngineTool, ToolMetadata
+from llama_index.core.agent import ReActAgent
+from llama_index.llms.openai import OpenAI
 
-load_dotenv()
 
-population_path = os.path.join("data", "population.csv")
-population_df = pd.read_csv(population_path)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_rows', None)
+h1b_data_path = os.path.join("data", "filtered_h1b_data.csv")
+h1b_df = pd.read_csv(h1b_data_path)
 
-population_query_engine = PandasQueryEngine(
-    df=population_df, verbose=True, instruction_str=instruction_str
+#PandasQueryEngine: convert natural language to Pandas python code using LLMs.
+#The input to the PandasQueryEngine is a Pandas dataframe, and the output is a response.
+h1b_query_engine = PandasQueryEngine(
+    df=h1b_df, verbose=True, instruction_str=instruction_str
 )
-population_query_engine.update_prompts({"pandas_prompt": new_prompt})
+h1b_query_engine.update_prompts({"pandas_prompt": new_prompt})
+
 
 tools = [
     note_engine,
     QueryEngineTool(
-        query_engine=population_query_engine,
+        query_engine=h1b_query_engine,
         metadata=ToolMetadata(
-            name="population_data",
-            description="this gives information at the world population and demographics",
-        ),
-    ),
-    QueryEngineTool(
-        query_engine=canada_engine,
-        metadata=ToolMetadata(
-            name="canada_data",
-            description="this gives detailed information about canada the country",
-        ),
-    ),
+            name="h1b_data",
+            description="this csv file has details of h1b filings made by the employers",
+       ),
+  
+  )
 ]
 
-llm = OpenAI(model="gpt-3.5-turbo-0613")
+
+
+llm = OpenAI(model="gpt-3.5-turbo")
 agent = ReActAgent.from_tools(tools, llm=llm, verbose=True, context=context)
 
 while (prompt := input("Enter a prompt (q to quit): ")) != "q":
