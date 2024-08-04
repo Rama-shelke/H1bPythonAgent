@@ -21,6 +21,8 @@ h1b_df = pd.read_csv(h1b_data_path)
 h1b_query_engine = PandasQueryEngine(
     df=h1b_df, verbose=True, instruction_str=instruction_str
 )
+
+# Updates the prompt templates used by the query engine to guide how it processes and responds to queries.
 h1b_query_engine.update_prompts({"pandas_prompt": new_prompt})
 
 
